@@ -1,11 +1,9 @@
 use std::{env, path::PathBuf};
 
 use bat::PrettyPrinter;
-use open_api_models::{Gpt3Role, Message, OpenAiRequestBody, OpenAiResponse, OpenApiModel};
-use session_storage::SessionStorage;
-
-mod open_api_models;
-mod session_storage;
+use cmd_gpt::open_ai_client;
+use cmd_gpt::open_api_models::{Gpt3Role, Message, OpenAiRequestBody, OpenApiModel};
+use cmd_gpt::session_storage::SessionStorage;
 
 fn main() {
     env_logger::init();
@@ -26,20 +24,11 @@ fn main() {
         messages: session.messages.clone(),
     };
 
-    let body = serde_json::to_string(&body).unwrap();
+    let client = open_ai_client::Client::new(api_key);
+    let response = client.send(body).expect("failed to send request");
 
-    let client = reqwest::blocking::Client::new();
-    let body = client
-        .post("https://api.openai.com/v1/chat/completions")
-        .header("Authorization", format!("Bearer {}", api_key))
-        .header("Content-Type", "application/json")
-        .body(body)
-        .send()
-        .unwrap();
-
-    let response: OpenAiResponse = serde_json::from_str(&body.text().unwrap()).unwrap();
-
-    session.messages.push(Message {
+    log::debug!("Usage: {:?}", response.usage);
+    session.push_message(Message {
         role: Gpt3Role::Assistant,
         content: response.choices[0].message.content.clone(),
     });

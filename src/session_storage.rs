@@ -19,6 +19,10 @@ impl Session {
             messages: Vec::new(),
         }
     }
+
+    pub fn push_message(&mut self, message: Message) {
+        self.messages.push(message);
+    }
 }
 
 pub struct SessionStorage {
