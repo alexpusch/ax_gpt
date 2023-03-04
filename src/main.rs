@@ -8,6 +8,8 @@ mod open_api_models;
 mod session_storage;
 
 fn main() {
+    env_logger::init();
+
     let prompt = std::env::args().skip(1).collect::<Vec<String>>().join(" ");
     let api_key = env::var("OPENAI_API_KEY").expect("OPENAI_API_KEY not set");
 
