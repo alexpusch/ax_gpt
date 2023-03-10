@@ -1,11 +1,15 @@
+use std::io::stdout;
+use std::io::Write;
 use std::{env, path::PathBuf};
 
 use bat::PrettyPrinter;
 use cmd_gpt::open_ai_client;
-use cmd_gpt::open_api_models::{Gpt3Role, Message, OpenAiRequestBody, OpenApiModel};
+use cmd_gpt::open_api_models::{Gpt3Role, Message, OpenAiRequestBody, OpenApiModel, SseChunk};
 use cmd_gpt::session_storage::SessionStorage;
+use futures::StreamExt;
 
-fn main() {
+#[tokio::main]
+async fn main() {
     env_logger::init();
 
     let prompt = std::env::args().skip(1).collect::<Vec<String>>().join(" ");
@@ -22,24 +26,33 @@ fn main() {
     let body = OpenAiRequestBody {
         model: OpenApiModel::Gpt3_5Turbo,
         messages: session.messages.clone(),
+        stream: true,
     };
 
     let client = open_ai_client::Client::new(api_key);
-    let response = client.send(body).expect("failed to send request");
+    let resposne = client.stream(body).expect("failed to send request");
 
-    log::debug!("Usage: {:?}", response.usage);
+    let full_response = resposne
+        .inspect(|s| {
+            print!("{}", s);
+            stdout().flush().expect("failed to flush stdout");
+        })
+        .collect::<Vec<_>>()
+        .await
+        .join(" ");
+
     session.push_message(Message {
         role: Gpt3Role::Assistant,
-        content: response.choices[0].message.content.clone(),
+        content: full_response,
     });
 
     session_storage
         .save(&session)
         .expect("failed to save session");
 
-    PrettyPrinter::new()
-        .input_from_bytes(response.choices[0].message.content.as_bytes())
-        .language("markdown")
-        .print()
-        .unwrap();
+    // PrettyPrinter::new()
+    //     .input_from_bytes(response.choices[0].message.content.as_bytes())
+    //     .language("markdown")
+    //     .print()
+    //     .unwrap();
 }

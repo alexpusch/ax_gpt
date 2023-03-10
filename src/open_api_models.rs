@@ -24,6 +24,7 @@ pub struct Message {
 pub struct OpenAiRequestBody {
     pub model: OpenApiModel,
     pub messages: Vec<Message>,
+    pub stream: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -47,4 +48,25 @@ pub struct OpenAiChoice {
 pub struct OpenAiMessage {
     pub role: Gpt3Role,
     pub content: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SseChunk {
+    pub id: String,
+    pub object: String,
+    pub created: u64,
+    pub model: String,
+    pub choices: Vec<Choice>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Choice {
+    pub delta: Delta,
+    pub index: u64,
+    pub finish_reason: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Delta {
+    pub content: Option<String>,
 }
