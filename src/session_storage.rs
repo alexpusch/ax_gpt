@@ -6,7 +6,7 @@ use crate::open_api_models::Message;
 
 const SESSION_TTL: Duration = Duration::from_secs(5 * 60);
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Session {
     pub created_at: DateTime<Utc>,
     pub messages: Vec<Message>,

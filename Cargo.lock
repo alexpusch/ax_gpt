@@ -272,6 +272,7 @@ dependencies = [
  "env_logger",
  "eventsource-client",
  "futures",
+ "iter-read",
  "libc",
  "log",
  "reqwest",
@@ -995,6 +996,12 @@ dependencies = [
  "rustix",
  "windows-sys 0.45.0",
 ]
+
+[[package]]
+name = "iter-read"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c397ca3ea05ad509c4ec451fea28b4771236a376ca1c69fd5143aae0cf8f93c4"
 
 [[package]]
 name = "itoa"
