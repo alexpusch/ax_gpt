@@ -47,11 +47,11 @@ impl Client {
             while let Some(event) = stream.next().await {
                 match event {
                     Ok(event) => match event {
-                        SSE::Comment(comment) => {
-                            println!("got a comment event: {:?}", comment);
+                        SSE::Comment(_) => {
+                            // should not happened
                         }
                         SSE::Event(event) => {
-                            let data: SseChunk = serde_json::from_str(&event.data).expect("valid json");
+                            let data: SseChunk = serde_json::from_str(&event.data).expect("invalid json when deserializing");
                             let finish_reason = data.choices[0].finish_reason.clone();
 
                             if finish_reason == Some("stop".to_string()) {
@@ -63,15 +63,19 @@ impl Client {
                                     .delta
                                     .content
                                     .clone()
-                                    .unwrap_or(" ".into())
-                                    .clone();
+                                    .unwrap_or("".into());
 
                             yield value;
 
                         }
                     },
+                    Err(eventsource_client::Error::UnexpectedResponse(status)) if status == 401 => {
+                        println!("Unautherized OpenAI API key: {:?}", status);
+                        break;
+                    },
                     Err(error) => {
-                        print!("Error from SSR: {:?}", error);
+                        println!("Unexpected server error: {:?}", error);
+                        break;
                     }
                 }
             }

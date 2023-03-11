@@ -76,10 +76,10 @@ create the config file {} and insert your OpenAI api key:
     });
 
     let mut tokens = Vec::<String>::new();
-    let r = IterRead::new(rx.iter().fuse().inspect(|v| tokens.push(v.clone())));
+    let token_reader = IterRead::new(rx.iter().fuse().inspect(|v| tokens.push(v.clone())));
 
     PrettyPrinter::new()
-        .input_from_reader(r)
+        .input_from_reader(token_reader)
         .language("markdown")
         .print()
         .unwrap();
