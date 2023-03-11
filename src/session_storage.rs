@@ -23,6 +23,17 @@ impl Session {
     pub fn push_message(&mut self, message: Message) {
         self.messages.push(message);
     }
+
+    pub fn trim(&mut self, depth: usize) {
+        self.messages = self
+            .messages
+            .iter()
+            .rev()
+            .take(depth)
+            .rev()
+            .cloned()
+            .collect();
+    }
 }
 
 pub struct SessionStorage {
@@ -32,7 +43,7 @@ pub struct SessionStorage {
 impl SessionStorage {
     pub fn new(path: PathBuf) -> Self {
         let session_id = get_current_session_id();
-        log::debug!("Session ID: {}", session_id);
+        log::debug!("Storing session in {:?}, Session ID: {}", path, session_id);
         std::fs::create_dir_all(&path).expect("failed to create session storage directory");
 
         let filename = format!("{}.json", session_id);

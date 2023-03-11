@@ -1,11 +1,10 @@
-use std::path::PathBuf;
-
 use aks_gpt::config::{get_config_filepath, AksConfigError};
 use aks_gpt::open_ai_client;
 use aks_gpt::open_api_models::{Gpt3Role, Message, OpenAiRequestBody};
 use aks_gpt::session_storage::SessionStorage;
 use bat::PrettyPrinter;
 use futures::StreamExt;
+use std::env::temp_dir;
 
 use colored::*;
 use iter_read::IterRead;
@@ -36,8 +35,14 @@ create the config file {} and insert your OpenAI api key:
         std::process::exit(1);
     };
 
-    let session_storage = SessionStorage::new(PathBuf::from("/tmp/sessions"));
+    let session_storage = SessionStorage::new(temp_dir().join("aks_gpt/sessions"));
     let mut session = session_storage.get().expect("failed to load session");
+
+    session.messages.push(Message {
+        role: Gpt3Role::User,
+        content: prompt.to_string(),
+    });
+
     let mut session_clone = session.clone();
 
     // I wanted to make the output stream, but be pretty printed in the same time.
@@ -55,11 +60,6 @@ create the config file {} and insert your OpenAI api key:
                 },
             );
         }
-
-        session_clone.messages.push(Message {
-            role: Gpt3Role::User,
-            content: prompt.to_string(),
-        });
 
         let body = OpenAiRequestBody {
             model: config.model,
@@ -89,6 +89,8 @@ create the config file {} and insert your OpenAI api key:
         role: Gpt3Role::Assistant,
         content: full_response,
     });
+
+    session.trim(4);
 
     session_storage
         .save(&session)

@@ -34,6 +34,8 @@ pub struct AksConfig {
     pub openai_api_key: String,
     pub system_prompt: String,
     pub model: String,
+    #[serde(default = "default_sessions_depth")]
+    pub sessions_depth: usize,
     // #[serde(skip_serializing_if = "Option::is_none")]
     // pub temperature: Option<f64>,
     // #[serde(skip_serializing_if = "Option::is_none")]
@@ -46,12 +48,17 @@ pub struct AksConfig {
     // pub frequency_penalty: Option<f64>,
 }
 
+fn default_sessions_depth() -> usize {
+    4
+}
+
 impl Default for AksConfig {
     fn default() -> Self {
         AksConfig {
             openai_api_key: API_KEY_PLACEHOLDER.into(),
             system_prompt: DEFAULT_SYSTEM_PROMPT.into(),
             model: DEFAULT_MODEL.into(),
+            sessions_depth: 4,
         }
     }
 }
