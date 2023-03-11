@@ -1,5 +1,5 @@
 [package]
-name = "aks_gpt"
+name = "ax_gpt"
 version = "0.1.0"
 edition = "2021"
 
@@ -24,6 +24,6 @@ thiserror = "1.0.39"
 colored = "2.0.0"
 
 [[bin]]
-name = "aks"
+name = "ax"
 
   

@@ -15,10 +15,10 @@ use thiserror::Error;
 const API_KEY_PLACEHOLDER: &str = "OPENAI API KEY";
 const DEFAULT_SYSTEM_PROMPT: &str = "You are a programmers assistant";
 const DEFAULT_MODEL: &str = "gpt-3.5-turbo";
-const CONFIG_FILE_NAME: &str = "aks_gpt.json";
+const CONFIG_FILE_NAME: &str = "ax_gpt.json";
 
 #[derive(Error, Debug)]
-pub enum AksConfigError {
+pub enum AxConfigError {
     #[error("Missing Api key")]
     MissingApiKey,
 
@@ -30,7 +30,7 @@ pub enum AksConfigError {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct AksConfig {
+pub struct AxConfig {
     pub openai_api_key: String,
     pub system_prompt: String,
     pub model: String,
@@ -52,9 +52,9 @@ fn default_sessions_depth() -> usize {
     4
 }
 
-impl Default for AksConfig {
+impl Default for AxConfig {
     fn default() -> Self {
-        AksConfig {
+        AxConfig {
             openai_api_key: API_KEY_PLACEHOLDER.into(),
             system_prompt: DEFAULT_SYSTEM_PROMPT.into(),
             model: DEFAULT_MODEL.into(),
@@ -63,7 +63,7 @@ impl Default for AksConfig {
     }
 }
 
-pub fn get_config() -> Result<AksConfig, AksConfigError> {
+pub fn get_config() -> Result<AxConfig, AxConfigError> {
     let config_dir = get_config_dir();
     let config_file_path = config_dir.join(CONFIG_FILE_NAME);
 
@@ -76,20 +76,20 @@ pub fn get_config() -> Result<AksConfig, AksConfigError> {
 
     let config = match config_builder.build() {
         Ok(config) => config
-            .try_deserialize::<AksConfig>()
-            .map_err(AksConfigError::ConfigError)?,
+            .try_deserialize::<AxConfig>()
+            .map_err(AxConfigError::ConfigError)?,
         Err(ConfigError::Foreign(_)) => {
-            let default_config = AksConfig::default();
+            let default_config = AxConfig::default();
             write_default_config_file(&config_dir, CONFIG_FILE_NAME, &default_config)
-                .map_err(AksConfigError::FailedToWriteConfig)?;
+                .map_err(AxConfigError::FailedToWriteConfig)?;
 
             default_config
         }
-        Err(e) => return Err(AksConfigError::ConfigError(e)),
+        Err(e) => return Err(AxConfigError::ConfigError(e)),
     };
 
     if config.openai_api_key == API_KEY_PLACEHOLDER {
-        return Err(AksConfigError::MissingApiKey);
+        return Err(AxConfigError::MissingApiKey);
     }
 
     Ok(config)
@@ -107,7 +107,7 @@ pub fn get_config_filepath() -> PathBuf {
 fn write_default_config_file(
     config_dir: &Path,
     config_filename: &str,
-    config: &AksConfig,
+    config: &AxConfig,
 ) -> io::Result<()> {
     fs::create_dir_all(config_dir)?;
     let mut file = fs::File::create(config_dir.join(config_filename))?;

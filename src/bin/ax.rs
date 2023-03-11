@@ -1,7 +1,7 @@
-use aks_gpt::config::{get_config_filepath, AksConfigError};
-use aks_gpt::open_ai_client;
-use aks_gpt::open_api_models::{Gpt3Role, Message, OpenAiRequestBody};
-use aks_gpt::session_storage::SessionStorage;
+use ax_gpt::config::{get_config_filepath, AxConfigError};
+use ax_gpt::open_ai_client;
+use ax_gpt::open_api_models::{Gpt3Role, Message, OpenAiRequestBody};
+use ax_gpt::session_storage::SessionStorage;
 use bat::PrettyPrinter;
 use futures::StreamExt;
 use std::env::temp_dir;
@@ -16,12 +16,12 @@ async fn main() {
 
     let prompt = std::env::args().skip(1).collect::<Vec<String>>().join(" ");
 
-    let config = aks_gpt::config::get_config();
+    let config = ax_gpt::config::get_config();
 
     let Ok(config) = config else {
         match config {
             Ok(_) => unreachable!(),
-            Err(AksConfigError::MissingApiKey) => println!("OpenAI api key is requried. 
+            Err(AxConfigError::MissingApiKey) => println!("OpenAI api key is requried. 
 create the config file {} and insert your OpenAI api key:
 
 {{  
@@ -29,13 +29,13 @@ create the config file {} and insert your OpenAI api key:
 }}
     
 ", get_config_filepath().to_string_lossy().bold()),
-            Err(AksConfigError::FailedToWriteConfig(e)) => println!("Failed to write config file: {}", e),
-            Err(AksConfigError::ConfigError(e)) => println!("Failed to open config file: {}", e)
+            Err(AxConfigError::FailedToWriteConfig(e)) => println!("Failed to write config file: {}", e),
+            Err(AxConfigError::ConfigError(e)) => println!("Failed to open config file: {}", e)
         }
         std::process::exit(1);
     };
 
-    let session_storage = SessionStorage::new(temp_dir().join("aks_gpt/sessions"));
+    let session_storage = SessionStorage::new(temp_dir().join("ax_gpt/sessions"));
     let mut session = session_storage.get().expect("failed to load session");
 
     session.messages.push(Message {
