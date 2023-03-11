@@ -1,12 +1,6 @@
 pub use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
-pub enum OpenApiModel {
-    #[serde(rename = "gpt-3.5-turbo")]
-    Gpt3_5Turbo,
-}
-
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum Gpt3Role {
     User,
@@ -22,7 +16,7 @@ pub struct Message {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct OpenAiRequestBody {
-    pub model: OpenApiModel,
+    pub model: String,
     pub messages: Vec<Message>,
     pub stream: bool,
 }

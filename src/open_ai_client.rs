@@ -5,7 +5,6 @@ use futures::stream::BoxStream;
 use futures::stream::StreamExt;
 
 pub struct Client {
-    // client: reqwest::blocking::Client,
     api_key: String,
 }
 
@@ -32,8 +31,9 @@ impl Client {
         &self,
         request: OpenAiRequestBody,
     ) -> eventsource_client::Result<BoxStream<String>> {
-        let body = serde_json::to_string(&request).unwrap();
+        log::debug!("Sending request: {:?}", request);
 
+        let body = serde_json::to_string(&request).unwrap();
         let client = ClientBuilder::for_url("https://api.openai.com/v1/chat/completions")?
             .method("POST".into())
             .header("Authorization", &format!("Bearer {}", self.api_key))?
@@ -55,6 +55,7 @@ impl Client {
                             let finish_reason = data.choices[0].finish_reason.clone();
 
                             if finish_reason == Some("stop".to_string()) {
+                                yield "\n".to_string();
                                 break;
                             }
 

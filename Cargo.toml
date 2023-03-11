@@ -1,5 +1,5 @@
 [package]
-name = "cmd_gpt"
+name = "aks_gpt"
 version = "0.1.0"
 edition = "2021"
 
@@ -19,6 +19,9 @@ futures = "0.3.26"
 tokio = { version = "1", features = ["full"] }
 async-stream = "0.3.4"
 iter-read = "0.3.1"
+config = "0.13.3"
+thiserror = "1.0.39"
+colored = "2.0.0"
 
 [[bin]]
 name = "aks"
