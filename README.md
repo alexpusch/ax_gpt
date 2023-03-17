@@ -4,9 +4,6 @@ Ax Chat GPT directly from the terminal
 
 ![Demo](/assets/image.png?raw=true "Optional Title")
 
-### Installation
-`cargo install ax`
-
 ### Usage example
 `ax how to open a file in python`
 
